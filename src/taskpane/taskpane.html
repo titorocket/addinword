@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistente Legal</title>
+
+    <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css">
+    <link href="taskpane.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body class="ms-Fabric" dir="ltr">
+    <main id="app-body" class="ms-welcome__main">
+        <!-- Header con icono y título -->
+        <div class="header-section">
+            <div class="header-icon">⚖️</div>
+            <div class="header-content">
+                <h1 class="header-title">Asistente Legal</h1>
+                <p class="header-subtitle">Herramienta para análisis de documentos jurídicos</p>
+            </div>
+        </div>
+
+        <!-- Paso 1: Cargar documento -->
+        <div class="step-card" id="upload-step">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-info">
+                    <h3 class="step-title">Cargar Documento</h3>
+                    <p class="step-description">Selecciona un archivo PDF para analizar</p>
+                </div>
+            </div>
+            
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📄</div>
+                <p class="upload-text">Arrastra tu archivo PDF aquí o</p>
+                <input type="file" id="pdf-file" accept=".pdf" class="file-input" style="display: none;">
+                <button id="select-file-btn" class="upload-button">
+                    <span class="button-icon">📁</span>
+                    Seleccionar archivo
+                </button>
+                <p class="upload-hint">Solo archivos PDF • Máximo 10MB</p>
+            </div>
+        </div>
+
+        <!-- Loading spinner mejorado -->
+        <div id="loading-spinner" class="loading-container" style="display: none;">
+            <div class="spinner-animation">
+                <div class="spinner-circle"></div>
+                <div class="spinner-circle"></div>
+                <div class="spinner-circle"></div>
+            </div>
+            <p class="loading-text">Procesando documento PDF...</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Controles principales (hidden inicialmente) -->
+        <div id="main-controls" style="display: none;">
+            <!-- Información del documento cargado -->
+            <div class="document-info">
+                <div class="document-icon">✅</div>
+                <div class="document-details">
+                    <h4 id="document-name">Documento cargado exitosamente</h4>
+                    <p id="document-stats">Procesando información...</p>
+                </div>
+            </div>
+
+            <!-- Paso 2: Buscar por artículo -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-info">
+                        <h3 class="step-title">Buscar Artículo Específico</h3>
+                        <p class="step-description">Encuentra e inserta artículos por número</p>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <div class="input-group">
+                        <label class="input-label" for="search-term">Número de Artículo</label>
+                        <div class="input-wrapper">
+                            <input class="search-input" type="text" id="search-term" 
+                                   placeholder="Ej: 132, Art. 45, Artículo 20">
+                            <button id="search-button" class="search-button">
+                                <span class="button-icon">🔍</span>
+                                Buscar e Insertar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="search-result" class="result-message"></div>
+                </div>
+            </div>
+
+            <!-- Paso 3: Vista previa y selección -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-info">
+                        <h3 class="step-title">Vista Previa del Documento</h3>
+                        <p class="step-description">Selecciona texto directamente desde el documento</p>
+                    </div>
+                </div>
+                
+                <div class="preview-controls">
+                    <button id="insert-selection-button" class="insert-button">
+                        <span class="button-icon">📝</span>
+                        Insertar Texto Seleccionado
+                    </button>
+                    <div class="preview-hint">
+                        💡 <strong>Tip:</strong> Selecciona cualquier texto en la vista previa y presiona el botón para insertarlo en tu documento.
+                    </div>
+                </div>
+                
+                <div class="pdf-viewer-wrapper">
+                    <div class="viewer-toolbar">
+                        <span class="viewer-title">📖 Contenido del documento</span>
+                        <div class="viewer-controls">
+                            <button id="zoom-out" class="toolbar-btn" title="Reducir texto">A-</button>
+                            <button id="zoom-in" class="toolbar-btn" title="Aumentar texto">A+</button>
+                        </div>
+                    </div>
+                    <div id="pdf-viewer" class="pdf-viewer-container">
+                        <div class="viewer-placeholder">
+                            <div class="placeholder-icon">📄</div>
+                            <p>El contenido del documento aparecerá aquí</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                Asistente Legal • Versión 2.0 • 
+                <span class="footer-link">Ayuda</span>
+            </p>
+        </div>
+    </main>
+
+    <script src="taskpane.js"></script>
+</body>
+
+</html>
