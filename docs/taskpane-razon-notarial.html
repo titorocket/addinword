@@ -31,17 +31,17 @@
 
     <div class="form-field">
         <label for="distrito">Distrito:</label>
-        <input type="text" id="distrito" placeholder="ej: Santa Tecla">
+        <input type="text" id="distrito" value="Santa Tecla">
     </div>
 
     <div class="form-field">
         <label for="municipio">Municipio:</label>
-        <input type="text" id="municipio" placeholder="ej: Santa Tecla">
+        <input type="text" id="municipio" value="Santa Tecla">
     </div>
 
     <div class="form-field">
         <label for="departamento">Departamento:</label>
-        <input type="text" id="departamento" placeholder="ej: La Libertad">
+        <input type="text" id="departamento" value="La Libertad">
     </div>
 
     <div class="form-field">
@@ -69,7 +69,7 @@
 
     <div class="form-field">
         <label for="anio">Año (complemento en letras):</label>
-        <input type="text" id="anio" placeholder="ej: veinticinco">
+        <input type="text" id="anio" value="veinticinco">
     </div>
     
     <button id="insertButton">Insertar Razón Notarial</button>
@@ -78,6 +78,12 @@
     <script>
         Office.onReady(function(info) {
             if (info.host === Office.HostType.Word) {
+                // Pre-seleccionar el mes actual
+                var meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                var fechaActual = new Date();
+                document.getElementById('mes').value = meses[fechaActual.getMonth()];
+                document.getElementById('dias').value = convertirNumeroALetras(fechaActual.getDate());
+
                 document.getElementById("insertButton").onclick = insertarRazon;
             }
         });
@@ -109,19 +115,40 @@
                 anio + ".";
 
             Word.run(function (context) {
+                // 1. Insertamos el texto y guardamos la referencia al rango insertado
                 var selection = context.document.getSelection();
                 var insertedRange = selection.insertText(razonFinal, "Replace");
-                
-                // --- CAMBIO: Se aplica el formato justificado al párrafo del texto insertado ---
-                insertedRange.paragraphFormat.alignment = 'Justified';
-                
+
+                // 2. Le ordenamos a Word que SELECCIONE ese rango que acabamos de insertar
+                insertedRange.select();
+
+                // 3. Sincronizamos para que la selección se haga efectiva
                 return context.sync().then(function() {
-                    statusDiv.innerText = "Razón insertada con éxito.";
+                    // 4. Ahora que el texto está seleccionado, obtenemos esa nueva selección
+                    var newSelection = context.document.getSelection();
+                    // 5. Y APLICAMOS el formato a la selección actual.
+                    newSelection.paragraphFormat.alignment = 'Justified';
+                    return context.sync();
                 });
+            }).then(function() {
+                statusDiv.innerText = "Razón insertada con éxito.";
             }).catch(function (error) {
                 console.log("Error: " + error);
                 statusDiv.innerText = "Hubo un error al insertar el texto.";
             });
+        }
+        
+        // Función auxiliar para poner el día actual en letras
+        function convertirNumeroALetras(num) {
+            var unidades = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez", "once", "doce", "trece", "catorce", "quince", "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte", "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco", "veintiséis", "veintisiete", "veintiocho", "veintinueve"];
+            if (num < 30) {
+                return unidades[num];
+            } else if (num === 30) {
+                return "treinta";
+            } else if (num === 31) {
+                return "treinta y uno";
+            }
+            return num.toString();
         }
     </script>
 </body>
