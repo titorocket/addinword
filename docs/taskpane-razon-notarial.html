@@ -83,7 +83,6 @@
         });
 
         function insertarRazon() {
-            // 1. Recoger todos los valores del formulario
             var folios = document.getElementById('folios').value;
             var distrito = document.getElementById('distrito').value;
             var municipio = document.getElementById('municipio').value;
@@ -93,13 +92,11 @@
             var anio = document.getElementById('anio').value;
             var statusDiv = document.getElementById('status');
             
-            // Verificación simple de que los campos no estén vacíos
             if (!folios || !distrito || !municipio || !departamento || !dias || !anio) {
                 statusDiv.innerText = "Error: Por favor, rellena todos los campos.";
                 return;
             }
 
-            // 2. Construir la cadena de texto completa
             var razonFinal = "EL INFRASCRITO NOTARIO CERTIFICA QUE: la presente fotocopia que consta de " +
                 folios + " folio(s), es copia fiel y conforme de su original con el cual se confrontó, de " +
                 "conformidad con el Artículo treinta de la Ley del Ejercicio Notarial de la Jurisdicción Voluntaria " +
@@ -111,10 +108,12 @@
                 mes + " del año dos mil " +
                 anio + ".";
 
-            // 3. Insertar el texto en el documento de Word
             Word.run(function (context) {
                 var selection = context.document.getSelection();
-                selection.insertText(razonFinal, "Replace");
+                var insertedRange = selection.insertText(razonFinal, "Replace");
+                
+                // --- CAMBIO: Se aplica el formato justificado al párrafo del texto insertado ---
+                insertedRange.paragraphFormat.alignment = 'Justified';
                 
                 return context.sync().then(function() {
                     statusDiv.innerText = "Razón insertada con éxito.";
