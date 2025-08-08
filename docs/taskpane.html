@@ -1,1 +1,87 @@
-<!doctype html><html><head><meta charset="UTF-8"/><meta http-equiv="X-UA-Compatible" content="IE=Edge"/><meta name="viewport" content="width=device-width,initial-scale=1"><title>Asistente Legal</title><script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script><link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/lucide.min.css"><link href="45d4fea2e055b6c61a6b.css" rel="stylesheet"/><script defer="defer" src="polyfill.js"></script><script defer="defer" src="taskpane.js"></script></head><body class="ms-Fabric" dir="ltr"><main id="app-body" class="ms-welcome__main"><div class="header-section"><div class="header-icon">⚖️</div><div class="header-content"><h1 class="header-title">Asistente Legal</h1><p class="header-subtitle">Herramienta para análisis de documentos jurídicos</p></div></div><div class="step-card" id="upload-step"><div class="step-header"><div class="step-number">1</div><div class="step-info"><h3 class="step-title">Cargar Documento</h3><p class="step-description">Selecciona un archivo PDF para analizar</p></div></div><div class="upload-area" id="upload-area"><div class="upload-icon">📄</div><p class="upload-text">Arrastra tu archivo PDF aquí o</p><input type="file" id="pdf-file" accept=".pdf" class="file-input" style="display:none"> <button id="select-file-btn" class="upload-button"><span class="button-icon">📁</span> Seleccionar archivo</button><p class="upload-hint">Solo archivos PDF • Máximo 10MB</p></div></div><div id="loading-spinner" class="loading-container" style="display:none"><div class="spinner-animation"><div class="spinner-circle"></div><div class="spinner-circle"></div><div class="spinner-circle"></div></div><p class="loading-text">Procesando documento PDF...</p><div class="progress-bar"><div class="progress-fill"></div></div></div><div id="main-controls" style="display:none"><div class="document-info"><div class="document-icon">✅</div><div class="document-details"><h4 id="document-name">Documento cargado exitosamente</h4><p id="document-stats">Procesando información...</p></div></div><div class="step-card"><div class="step-header"><div class="step-number">2</div><div class="step-info"><h3 class="step-title">Buscar Artículo Específico</h3><p class="step-description">Encuentra e inserta artículos por número</p></div></div><div class="search-container"><div class="input-group"><label class="input-label" for="search-term">Número del Artículo</label><div class="input-wrapper"><input class="search-input" id="search-term" placeholder="Ej: 132, Art. 45, Artículo 20"> <button id="search-button" class="search-button"><span class="button-icon">🔍</span> Buscar e Insertar</button></div></div><div id="search-result" class="result-message"></div></div></div><div class="step-card"><div class="step-header"><div class="step-number">3</div><div class="step-info"><h3 class="step-title">Vista Previa del Documento</h3><p class="step-description">Selecciona texto directamente desde el documento</p></div></div><div class="preview-controls"><button id="insert-selection-button" class="insert-button"><span class="button-icon">📝</span> Insertar Texto Seleccionado</button><div class="preview-hint">💡 <strong>Tip:</strong> Selecciona cualquier texto en la vista previa y presiona el botón para insertarlo en tu documento.</div></div><div class="pdf-viewer-wrapper"><div class="viewer-toolbar"><span class="viewer-title">📖 Contenido del documento</span><div class="viewer-controls"><button id="zoom-out" class="toolbar-btn" title="Reducir texto">A-</button> <button id="zoom-in" class="toolbar-btn" title="Aumentar texto">A+</button></div></div><div id="pdf-viewer" class="pdf-viewer-container"><div class="viewer-placeholder"><div class="placeholder-icon">📄</div><p>El contenido del documento aparecerá aquí</p></div></div></div></div></div><div class="footer"><p class="footer-text">Asistente Legal • Versión 2.0 • <span class="footer-link">Ayuda</span></p></div></main><script src="c0ae34422ed02a3a2cd2.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>PDF417 DUI/Abogado - Decoder</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 0; padding: 0; }
+    .wrap { padding: 16px; }
+    h1 { font-size: 18px; margin: 0 0 12px; }
+    textarea, input, button { font-size: 14px; }
+    textarea { width: 100%; min-height: 120px; box-sizing: border-box; }
+    .row { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+    button { padding: 10px 14px; cursor: pointer; }
+    .ok { background: #2563eb; color:#fff; border:0; border-radius:6px; }
+    .ghost { background: #f3f4f6; border:1px solid #e5e7eb; border-radius:6px; }
+    .danger { background: #ef4444; color:#fff; border:0; border-radius:6px; }
+    .card { background:#fff; border:1px solid #e5e7eb; border-radius:8px; padding:12px; }
+    .grid { display:grid; gap:8px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .mono { font-family: Consolas, Monaco, "Courier New", monospace; }
+    .small { font-size: 12px; color: #374151; }
+    pre { white-space:pre-wrap; word-wrap:break-word; background:#f8fafc; padding:10px; border-radius:6px; border:1px solid #e5e7eb; }
+    .badge { display:inline-block; padding:2px 6px; font-size:12px; background:#e5e7eb; border-radius:999px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Decodificador PDF417 (DUI / Carnet de Abogado)</h1>
+    <div class="card">
+      <textarea id="pdf417Input" placeholder="Pega la cadena PDF417 aquí..."></textarea>
+      <div class="row">
+        <button id="btnDecode" class="ok">Decodificar</button>
+        <button id="btnInsert" class="ghost">Insertar en documento</button>
+        <button id="btnClear" class="danger">Limpiar</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="card" style="flex:1; min-width:280px">
+        <div class="badge">Resultado</div>
+        <pre id="output" class="mono">(sin datos)</pre>
+      </div>
+      <div class="card" style="flex:1; min-width:280px">
+        <div class="badge">Campos</div>
+        <div id="fields" class="grid grid-2 small"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function $(id){ return document.getElementById(id); }
+    Office.initialize = function () {};
+    function duiCheckDigit(dui8){
+      if (!/^\d{8}$/.test(dui8)) return "";
+      var pesos = [9,8,7,6,5,4,3,2], suma = 0;
+      for (var i=0; i<8; i++){ suma += parseInt(dui8.charAt(i), 10) * pesos[i]; }
+      var residuo = suma % 10;
+      return (residuo === 0) ? "0" : String(10 - residuo);
+    }
+    function decodeDUI(raw){
+      var delim = raw.indexOf("]]") > raw.indexOf("||") ? "]]" : "||";
+      var parts = raw.split(delim);
+      var base8 = (parts[0] || "").replace(/\D/g, "");
+      var dv = duiCheckDigit(base8);
+      return { tipo: "DUI", dui: base8 + dv, apellidos: (parts[1]||"").trim(), nombres: (parts[2]||"").trim() };
+    }
+    function decodeAbogado(raw){
+      var parts = raw.split("II");
+      return { tipo: "CARNET_ABOGADO", registro_abogado: (parts[1]||"").trim(), nombres: (parts[2]||"").trim(), apellidos: (parts[3]||"").trim() };
+    }
+    function detectAndDecode(raw){
+      if (raw.indexOf("II") >= 0 && raw.split("II").length >= 4) return decodeAbogado(raw);
+      if (raw.indexOf("||") >= 0 || raw.indexOf("]]") >= 0) return decodeDUI(raw);
+      throw new Error("Formato no reconocido");
+    }
+    $("btnDecode").onclick = function(){
+      try { var d = detectAndDecode($("pdf417Input").value); $("output").textContent = JSON.stringify(d,null,2); } catch(e){ alert(e.message); }
+    };
+    $("btnClear").onclick = function(){ $("pdf417Input").value=""; $("output").textContent="(sin datos)"; };
+    $("btnInsert").onclick = function(){
+      var text = $("output").textContent;
+      Word.run(function(ctx){ ctx.document.getSelection().insertText(text, "Replace"); return ctx.sync(); });
+    };
+  </script>
+</body>
+</html>
