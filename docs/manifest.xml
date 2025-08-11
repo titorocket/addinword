@@ -4,100 +4,82 @@
            xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
-  <Id>7e7c4d9f-2c0b-4d7a-92d1-2b9b9f5e9a10</Id>
+  <Id>5e7a0f5d-2c9a-4a1b-bd79-9a1a7b49f3e5</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>TitoRocket</ProviderName>
+  <ProviderName>Redacción Judicial</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
-  <DisplayName DefaultValue="PDF417 DUI/Abogado - Decoder"/>
-  <Description DefaultValue="Decodifica cadenas PDF417 de DUI y carnet de abogado y muestra el resultado."/>
-  <IconUrl DefaultValue="https://titorocket.github.io/addinword/assets/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://titorocket.github.io/addinword/assets/icon-64.png"/>
-
-  <SupportUrl DefaultValue="https://titorocket.github.io/addinword/"/>
-
+  <DisplayName DefaultValue="Redacción Judicial — Word" />
+  <Description DefaultValue="Revisión ortográfica y técnica jurídica con OpenAI para documentos y selecciones en Word." />
+  <IconUrl DefaultValue="https://titorocket.github.io/addinword/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://titorocket.github.io/addinword/icon-64.png" />
+  <SupportUrl DefaultValue="https://titorocket.github.io/addinword/" />
+  <AppDomains>
+    <AppDomain>https://titorocket.github.io/addinword</AppDomain>
+    <AppDomain>https://api.openai.com</AppDomain>
+    <AppDomain>https://appsforoffice.microsoft.com</AppDomain>
+  </AppDomains>
   <Hosts>
     <Host Name="Document"/>
   </Hosts>
-
-  <Requirements>
-    <Sets DefaultMinVersion="1.1">
-      <Set Name="Mailbox" MinVersion="1.1"/>
-    </Sets>
-  </Requirements>
-
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://titorocket.github.io/addinword/taskpane.html"/>
+    <SourceLocation DefaultValue="https://titorocket.github.io/addinword/taskpane.html" />
   </DefaultSettings>
-
   <Permissions>ReadWriteDocument</Permissions>
 
-  <VersionOverrides xsi:type="ov:VersionOverrides" Version="1.0">
-    <ov:Hosts>
-      <ov:Host xsi:type="ov:Document">
-        <ov:DesktopFormFactor>
-          <ov:GetStarted>
-            <ov:Title resid="residGetStartedTitle"/>
-            <ov:Description resid="residGetStartedDesc"/>
-            <ov:LearnMoreUrl resid="residGetStartedLearnMoreUrl"/>
-          </ov:GetStarted>
-
-          <ov:ExtensionPoint xsi:type="ov:PrimaryCommandSurface">
-            <ov:OfficeTab id="TabHome">
-              <ov:Group id="grpMain" label="PDF417">
-                <ov:Icon>
-                  <ov:bt:Image size="16" resid="icon16"/>
-                  <ov:bt:Image size="32" resid="icon32"/>
-                  <ov:bt:Image size="80" resid="icon80"/>
-                </ov:Icon>
-                <ov:Control xsi:type="ov:Button"
-                            id="btnOpenPane"
-                            label="Abrir Decodificador"
-                            onAction="showTaskPane"
-                            superTip="Abrir panel para decodificar PDF417">
-                  <ov:Icon>
-                    <ov:bt:Image size="16" resid="icon16"/>
-                    <ov:bt:Image size="32" resid="icon32"/>
-                    <ov:bt:Image size="80" resid="icon80"/>
-                  </ov:Icon>
-                </ov:Control>
-              </ov:Group>
-            </ov:OfficeTab>
-          </ov:ExtensionPoint>
-
-          <ov:Taskpane id="TaskpaneId" visibility="hidden">
-            <ov:SourceLocation resid="residTaskPaneUrl"/>
-          </ov:Taskpane>
-        </ov:DesktopFormFactor>
-      </ov:Host>
-    </ov:Hosts>
-
-    <ov:Resources>
-      <ov:bt:Images>
-        <ov:bt:Image id="icon16" DefaultValue="https://titorocket.github.io/addinword/assets/icon-16.png"/>
-        <ov:bt:Image id="icon32" DefaultValue="https://titorocket.github.io/addinword/assets/icon-32.png"/>
-        <ov:bt:Image id="icon80" DefaultValue="https://titorocket.github.io/addinword/assets/icon-80.png"/>
-      </ov:bt:Images>
-      <ov:bt:Urls>
-        <ov:bt:Url id="residTaskPaneUrl" DefaultValue="https://titorocket.github.io/addinword/taskpane.html"/>
-        <ov:bt:Url id="residGetStartedLearnMoreUrl" DefaultValue="https://titorocket.github.io/addinword/"/>
-      </ov:bt:Urls>
-      <ov:bt:ShortStrings>
-        <ov:bt:String id="residGetStartedTitle" DefaultValue="PDF417 DUI/Abogado"/>
-      </ov:bt:ShortStrings>
-      <ov:bt:LongStrings>
-        <ov:bt:String id="residGetStartedDesc" DefaultValue="Decodificador de cadenas PDF417 para DUI y carnet de abogado."/>
-      </ov:bt:LongStrings>
-    </ov:Resources>
-
-    <ov:Actions>
-      <ov:ShowTaskpane>
-        <ov:SourceLocation resid="residTaskPaneUrl"/>
-        <ov:Title resid="residGetStartedTitle"/>
-        <ov:SupportsPinning>true</ov:SupportsPinning>
-      </ov:ShowTaskpane>
-      <ov:ExecuteFunction>
-        <ov:FunctionName>showTaskPane</ov:FunctionName>
-      </ov:ExecuteFunction>
-    </ov:Actions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="residGetStartedTitle"/>
+            <Description resid="residGetStartedDescription"/>
+            <LearnMoreUrl resid="residGetStartedLearnMoreUrl"/>
+          </GetStarted>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="tabRedaccionJudicial">
+              <Group id="groupRevisiones" label="Redacción Judicial">
+                <Label resid="residGroupLabel"/>
+                <Icon>
+                  <bt:Image size="16" resid="icon16"/>
+                  <bt:Image size="32" resid="icon32"/>
+                  <bt:Image size="80" resid="icon80"/>
+                </Icon>
+                <Control xsi:type="Button" id="btnOpenPane" label="Abrir panel" screentip="Abrir Redacción Judicial" supertip="Abrir panel del complemento" icon="icon32" >
+                  <Icon>
+                    <bt:Image size="16" resid="icon16"/>
+                    <bt:Image size="32" resid="icon32"/>
+                    <bt:Image size="80" resid="icon80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="residTaskPaneUrl"/>
+                  </Action>
+                </Control>
+              </Group>
+            </CustomTab>
+          </ExtensionPoint>
+          <ExtensionPoint xsi:type="Taskpane">
+            <SourceLocation resid="residTaskPaneUrl"/>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="icon16" DefaultValue="https://titorocket.github.io/addinword/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://titorocket.github.io/addinword/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://titorocket.github.io/addinword/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="residTaskPaneUrl" DefaultValue="https://titorocket.github.io/addinword/taskpane.html"/>
+        <bt:Url id="residGetStartedLearnMoreUrl" DefaultValue="https://titorocket.github.io/addinword/"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="residGroupLabel" DefaultValue="Revisión y técnica"/>
+        <bt:String id="residGetStartedTitle" DefaultValue="Redacción Judicial"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="residGetStartedDescription" DefaultValue="Revise el documento completo o solo la selección con técnica jurídica."/>
+      </bt:LongStrings>
+    </Resources>
   </VersionOverrides>
 </OfficeApp>

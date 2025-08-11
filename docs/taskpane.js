@@ -1,3 +1,279 @@
-/*! For license information please see taskpane.js.LICENSE.txt */
-!function(){var e={58394:function(e,t,n){"use strict";e.exports=n.p+"45d4fea2e055b6c61a6b.css"},60947:function(e,t,n){"use strict";e.exports=n.p+"c0ae34422ed02a3a2cd2.js"}},t={};function n(r){var o=t[r];if(void 0!==o)return o.exports;var a=t[r]={exports:{}};return e[r](a,a.exports,n),a.exports}n.m=e,n.g=function(){if("object"==typeof globalThis)return globalThis;try{return this||new Function("return this")()}catch(e){if("object"==typeof window)return window}}(),n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},function(){var e;n.g.importScripts&&(e=n.g.location+"");var t=n.g.document;if(!e&&t&&(t.currentScript&&"SCRIPT"===t.currentScript.tagName.toUpperCase()&&(e=t.currentScript.src),!e)){var r=t.getElementsByTagName("script");if(r.length)for(var o=r.length-1;o>-1&&(!e||!/^http(s?):/.test(e));)e=r[o--].src}if(!e)throw new Error("Automatic publicPath is not supported in this browser");e=e.replace(/^blob:/,"").replace(/#.*$/,"").replace(/\?.*$/,"").replace(/\/[^\/]+$/,"/"),n.p=e}(),n.b=document.baseURI||self.location.href,function(){function e(){var n,r,o="function"==typeof Symbol?Symbol:{},a=o.iterator||"@@iterator",c=o.toStringTag||"@@toStringTag";function i(e,o,a,c){var i=o&&o.prototype instanceof u?o:u,l=Object.create(i.prototype);return t(l,"_invoke",function(e,t,o){var a,c,i,u=0,l=o||[],d=!1,f={p:0,n:0,v:n,a:p,f:p.bind(n,4),d:function(e,t){return a=e,c=0,i=n,f.n=t,s}};function p(e,t){for(c=e,i=t,r=0;!d&&u&&!o&&r<l.length;r++){var o,a=l[r],p=f.p,m=a[2];e>3?(o=m===t)&&(i=a[(c=a[4])?5:(c=3,3)],a[4]=a[5]=n):a[0]<=p&&((o=e<2&&p<a[1])?(c=0,f.v=t,f.n=a[1]):p<m&&(o=e<3||a[0]>t||t>m)&&(a[4]=e,a[5]=t,f.n=m,c=0))}if(o||e>1)return s;throw d=!0,t}return function(o,l,m){if(u>1)throw TypeError("Generator is already running");for(d&&1===l&&p(l,m),c=l,i=m;(r=c<2?n:i)||!d;){a||(c?c<3?(c>1&&(f.n=-1),p(c,i)):f.n=i:f.v=i);try{if(u=2,a){if(c||(o="next"),r=a[o]){if(!(r=r.call(a,i)))throw TypeError("iterator result is not an object");if(!r.done)return r;i=r.value,c<2&&(c=0)}else 1===c&&(r=a.return)&&r.call(a),c<2&&(i=TypeError("The iterator does not provide a '"+o+"' method"),c=1);a=n}else if((r=(d=f.n<0)?i:e.call(t,f))!==s)break}catch(e){a=n,c=1,i=e}finally{u=1}}return{value:r,done:d}}}(e,a,c),!0),l}var s={};function u(){}function l(){}function d(){}r=Object.getPrototypeOf;var f=[][a]?r(r([][a]())):(t(r={},a,function(){return this}),r),p=d.prototype=u.prototype=Object.create(f);function m(e){return Object.setPrototypeOf?Object.setPrototypeOf(e,d):(e.__proto__=d,t(e,c,"GeneratorFunction")),e.prototype=Object.create(p),e}return l.prototype=d,t(p,"constructor",d),t(d,"constructor",l),l.displayName="GeneratorFunction",t(d,c,"GeneratorFunction"),t(p),t(p,c,"Generator"),t(p,a,function(){return this}),t(p,"toString",function(){return"[object Generator]"}),(e=function(){return{w:i,m:m}})()}function t(e,n,r,o){var a=Object.defineProperty;try{a({},"",{})}catch(e){a=0}t=function(e,n,r,o){function c(n,r){t(e,n,function(e){return this._invoke(n,r,e)})}n?a?a(e,n,{value:r,enumerable:!o,configurable:!o,writable:!o}):e[n]=r:(c("next",0),c("throw",1),c("return",2))},t(e,n,r,o)}function n(e,t,n,r,o,a,c){try{var i=e[a](c),s=i.value}catch(e){return void n(e)}i.done?t(s):Promise.resolve(s).then(r,o)}var r="",o=14;function a(e){e.preventDefault(),e.stopPropagation()}function c(e){document.getElementById("upload-area").classList.add("drag-over")}function i(e){document.getElementById("upload-area").classList.remove("drag-over")}function s(e){var t=e.dataTransfer.files;if(t.length>0){var n=t[0];if("application/pdf"===n.type){var r=document.getElementById("pdf-file"),o=new DataTransfer;o.items.add(n),r.files=o.files,u({target:{files:[n]}})}else v("Por favor, selecciona un archivo PDF válido.","error")}}function u(e){var t=e.target.files[0];if(t&&"application/pdf"===t.type)if(t.size>10485760)v("El archivo es demasiado grande. Máximo 10MB permitido.","error");else{var n=new FileReader,a=document.getElementById("loading-spinner"),c=document.getElementById("main-controls"),i=document.getElementById("upload-step");a.style.display="block",c.style.display="none",i.style.display="none",r="",n.onload=function(){var e=new Uint8Array(this.result);pdfjsLib.getDocument(e).promise.then(function(e){var n=[],r=e.numPages;!function(e,t){document.getElementById("document-name").textContent=e,document.getElementById("document-stats").textContent="".concat(t," página").concat(1!==t?"s":""," • Procesado correctamente")}(t.name,r);for(var o=1;o<=e.numPages;o++)n.push(e.getPage(o).then(function(e){return e.getTextContent()}));return Promise.all(n)}).then(function(e){r=e.map(function(e,t){var n=e.items.map(function(e){return e.str}).join(" ");return"=== PÁGINA ".concat(t+1," ===\n").concat(n)}).join("\n\n"),function(e){var t=document.getElementById("pdf-viewer");t.innerHTML="",e.forEach(function(e,n){if(n>0){var r=document.createElement("div");r.style.cssText="\n                border-top: 2px solid var(--border-color);\n                margin: 20px 0;\n                padding-top: 15px;\n                font-weight: 600;\n                color: var(--neutral-secondary);\n                font-size: 12px;\n            ",r.textContent="--- PÁGINA ".concat(n+1," ---"),t.appendChild(r)}var o=document.createElement("div");o.style.cssText="\n            margin-bottom: 20px;\n            padding: 15px;\n            background: ".concat(n%2==0?"#fafafa":"#ffffff",";\n            border-radius: 4px;\n            border-left: 3px solid var(--primary-color);\n            user-select: text;\n            cursor: text;\n        ");var a=e.items.map(function(e){return e.str}).join(" ");o.textContent=a,function(e){var t=e.textContent,n=t.match(/((?:Artículo|Articulo|Art\.)\s+\d+[^\n]*)/gi);if(n){var r=t;n.forEach(function(e){r=r.replace(e,'<mark style="background: #fff3cd; padding: 2px 4px; border-radius: 3px; font-weight: 600;">'.concat(e,"</mark>"))}),e.innerHTML=r}}(o),t.appendChild(o)}),t.style.fontSize=o+"px"}(e),a.style.display="none",c.style.display="block",v("Documento cargado y procesado correctamente.","success")}).catch(function(e){console.error("Error al procesar el PDF:",e),a.style.display="none",i.style.display="block",v("Error al procesar el PDF. Verifica que el archivo no esté dañado.","error")})},n.readAsArrayBuffer(t)}else v("Por favor, selecciona un archivo PDF válido.","error")}function l(e){o=Math.max(10,Math.min(24,o+e)),document.getElementById("pdf-viewer").style.fontSize=o+"px",v("Tamaño de fuente: ".concat(o,"px"),"info",1500)}function d(){var e=document.getElementById("search-term").value.trim(),t=document.getElementById("search-result");if(r)if(e){t.textContent="",v("Buscando artículo...","info");for(var n=null,o=0,a=["(?:Artículo|Articulo|Art\\.)\\s+".concat(e,"(?:\\s|\\.|:)[\\s\\S]*?(?=(?:Artículo|Articulo|Art\\.)\\s+\\d|CAPÍTULO|TÍTULO|===|$)"),"Art\\s+".concat(e,"[\\s\\S]*?(?=Art\\s+\\d|CAPÍTULO|TÍTULO|===|$)"),"".concat(e,"\\.[\\s\\S]*?(?=\\d+\\.|CAPÍTULO|TÍTULO|===|$)")];o<a.length;o++){var c=new RegExp(a[o],"i"),i=r.match(c);if(i&&i[0]){n=i[0].trim();break}}n?(n=f(n),v("✅ Artículo ".concat(e," encontrado e insertado correctamente."),"success"),m(n),function(e){var t=document.getElementById("pdf-viewer"),n=new RegExp("((?:Artículo|Articulo|Art\\.)\\s+".concat(e,"[^\\n]*)"),"gi"),r=t.innerHTML.replace(n,'<span style="background: #ffeb3b; padding: 3px 6px; border-radius: 4px; font-weight: bold; animation: pulse 2s;">$1</span>');t.innerHTML=r;var o=t.querySelector('span[style*="ffeb3b"]');o&&o.scrollIntoView({behavior:"smooth",block:"center"})}(e)):v('❌ Artículo "'.concat(e,'" no encontrado. Verifica el número e intenta de nuevo.'),"error")}else v("Por favor, ingresa un número de artículo.","error");else v("Primero debes cargar un PDF.","error")}function f(e){return e.replace(/===[^===]*===/g,"").replace(/\s+/g," ").replace(/^\s+|\s+$/g,"").replace(/([.!?])\s*([A-ZÁÉÍÓÚÑ])/g,"$1\n\n$2")}function p(){var e=window.getSelection().toString().trim();e?(e.length<10&&v("⚠️ El texto seleccionado es muy corto. ¿Estás seguro de que es correcto?","warning"),m(f(e)),v("✅ Texto seleccionado insertado correctamente (".concat(e.length," caracteres)."),"success"),window.getSelection().removeAllRanges()):v("❌ Por favor, selecciona primero un fragmento de texto de la vista previa.","error")}function m(t){Word.run(function(){var r,o=(r=e().m(function n(r){var o,a,c;return e().w(function(e){for(;;)switch(e.p=e.n){case 0:return e.p=0,o=r.document.getSelection(),(a=o.insertText(t+"\n\n",Word.InsertLocation.end)).font.name="Calibri",a.font.size=11,a.paragraphFormat.spaceAfter=6,e.n=1,r.sync();case 1:v("✅ Texto insertado correctamente en el documento.","success"),e.n=3;break;case 2:e.p=2,c=e.v,console.error("Error al insertar texto:",c),v("❌ Error al insertar texto. Verifica que Word esté disponible.","error");case 3:return e.a(2)}},n,null,[[0,2]])}),function(){var e=this,t=arguments;return new Promise(function(o,a){var c=r.apply(e,t);function i(e){n(c,o,a,i,s,"next",e)}function s(e){n(c,o,a,i,s,"throw",e)}i(void 0)})});return function(e){return o.apply(this,arguments)}}()).catch(function(e){console.error("Error en Word.run:",e),v("❌ Error de conexión con Word.","error")})}function v(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:"info",n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:4e3,r=document.getElementById("search-result");r.className="result-message",r.classList.add(t),r.textContent=e,n>0&&setTimeout(function(){r.textContent="",r.className="result-message"},n)}Office.onReady(function(e){var t;e.host===Office.HostType.Word&&(document.getElementById("pdf-file").addEventListener("change",u),document.getElementById("select-file-btn").addEventListener("click",function(){document.getElementById("pdf-file").click()}),document.getElementById("search-button").addEventListener("click",d),document.getElementById("insert-selection-button").addEventListener("click",p),document.getElementById("zoom-in").addEventListener("click",function(){return l(2)}),document.getElementById("zoom-out").addEventListener("click",function(){return l(-2)}),document.getElementById("search-term").addEventListener("keypress",function(e){"Enter"===e.key&&d()}),t=document.getElementById("upload-area"),["dragenter","dragover","dragleave","drop"].forEach(function(e){t.addEventListener(e,a,!1)}),["dragenter","dragover"].forEach(function(e){t.addEventListener(e,c,!1)}),["dragleave","drop"].forEach(function(e){t.addEventListener(e,i,!1)}),t.addEventListener("drop",s,!1))});var y=document.createElement("style");y.textContent="\n    @keyframes pulse {\n        0% { transform: scale(1); }\n        50% { transform: scale(1.05); }\n        100% { transform: scale(1); }\n    }\n",document.head.appendChild(y),document.addEventListener("keydown",function(e){(e.ctrlKey||e.metaKey)&&"Enter"===e.key&&document.getElementById("search-term")===document.activeElement&&d(),(e.ctrlKey||e.metaKey)&&"i"===e.key&&(e.preventDefault(),p()),(e.ctrlKey||e.metaKey)&&"+"===e.key&&(e.preventDefault(),l(2)),(e.ctrlKey||e.metaKey)&&"-"===e.key&&(e.preventDefault(),l(-2))}),document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll("button").forEach(function(e){if(!e.title&&e.textContent){var t=e.textContent.trim();t.includes("Buscar")?e.title="Buscar artículo e insertar en el documento (Ctrl+Enter)":t.includes("Insertar")&&(e.title="Insertar texto seleccionado (Ctrl+I)")}});var e=document.querySelector(".footer-text");e&&(e.innerHTML+=' • <span title="Ctrl+Enter: Buscar, Ctrl+I: Insertar, Ctrl++/-: Zoom">Atajos disponibles</span>')})}(),function(){"use strict";new URL(n(58394),n.b),new URL(n(60947),n.b)}()}();
-//# sourceMappingURL=taskpane.js.map
+/* IE11/Word 2016 compatible JS (no ES6). */
+(function () {
+  "use strict";
+
+  var InsertLocationReplace = "Replace";
+  var modelName = "gpt-4o-mini";
+
+  Office.initialize = function () {
+    if (document && document.getElementById) {
+      document.getElementById("btnRevisarDoc").onclick = onRevisarDocumentoCompleto;
+      document.getElementById("btnRevisarSel").onclick = onRevisarSeleccion;
+      log("Listo. Abra un documento y use uno de los botones.");
+    }
+  };
+
+  function log(msg) {
+    var el = document.getElementById("log");
+    if (el) {
+      var ts = new Date().toLocaleTimeString();
+      el.textContent += "[" + ts + "] " + msg + "\n";
+      el.scrollTop = el.scrollHeight;
+    }
+  }
+
+  function getApiKey() {
+    var k = document.getElementById("apiKey").value;
+    return (k || "").trim();
+  }
+
+  function postJson(url, headers, bodyObj, onSuccess, onError) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      for (var h in headers) {
+        if (headers.hasOwnProperty(h)) {
+          xhr.setRequestHeader(h, headers[h]);
+        }
+      }
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              onSuccess(data);
+            } catch (e) {
+              onError(new Error("Respuesta no es JSON válido: " + e.message));
+            }
+          } else {
+            onError(new Error("HTTP " + xhr.status + ": " + xhr.responseText));
+          }
+        }
+      };
+      xhr.send(JSON.stringify(bodyObj));
+    } catch (ex) {
+      onError(ex);
+    }
+  }
+
+  function buildSystemPrompt() {
+    var sys =
+      "Eres un asistente especializado en redacción judicial en español. " +
+      "Corrige ortografía, gramática, sintaxis y estilo con técnica jurídica, " +
+      "manteniendo tono formal y objetivo propio de resoluciones judiciales de El Salvador." +
+      "\n\nREGLAS:" +
+      "\n1) No agregues saludos, cierres, sugerencias ni comentarios meta. Solo el texto solicitado." +
+      "\n2) No inventes citas ni jurisprudencia. Si hay citas existentes, respétalas; solo mejora puntuación y formato." +
+      "\n3) Respeta nombres, fechas, montos y números de expediente." +
+      "\n4) Mantén el sentido jurídico. Mejora coherencia, cohesión y precisión terminológica." +
+      "\n5) No cambies la estructura numerada ni referencias internas." +
+      "\n6) Puntuación y formato sobrios; evita oraciones excesivamente largas; usa conectores jurídicos típicos." +
+      "\n7) Neutralidad y objetividad; evita adjetivación innecesaria.";
+    return sys;
+  }
+
+  function buildUserPromptDocumento(parrafosArr, contexto) {
+    var payload = {
+      "parrafos": parrafosArr,
+      "contexto_documento": contexto
+    };
+
+    var user =
+      "TAREA: REVISAR_DOCUMENTO_COMPLETO\n\n" +
+      "DEVOLUCIÓN ESTRICTA: JSON con la forma:\n" +
+      '{\n  "version": "1.0",\n  "parrafos": [\n' +
+      '    {\"index\": 0, \"texto\": \"<párrafo 0 corregido>\"},\n' +
+      '    {\"index\": 1, \"texto\": \"<párrafo 1 corregido>\"}\n' +
+      "  ]\n}\n\n" +
+      "REGLAS DE SALIDA:\n" +
+      "- Mismo número de párrafos y mismos índices.\n" +
+      "- No agregar ni eliminar párrafos.\n" +
+      "- No incluir comentarios ni texto fuera del JSON.\n" +
+      "- En cada 'texto', solo contenido del párrafo, sin estilos.\n\n" +
+      "ENTRADA JSON:\n" + JSON.stringify(payload);
+
+    return user;
+  }
+
+  function buildUserPromptSeleccion(seleccionTexto) {
+    var user =
+      "TAREA: MEJORAR_SELECCION\n\n" +
+      "DEVOLUCIÓN ESTRICTA:\n" +
+      "- Entrega únicamente el texto revisado, listo para sustituir la selección.\n" +
+      "- No agregues comentarios ni prefijos/sufijos.\n" +
+      "- Conserva los saltos de párrafo existentes.\n\n" +
+      "CRITERIOS:\n" +
+      "- Refuerza claridad, coherencia y técnica argumentativa.\n" +
+      "- Usa terminología jurídica precisa según el contenido.\n" +
+      "- Si hay numerales/listas, respeta su estructura.\n" +
+      "- No inventes jurisprudencia ni doctrina; mejora la formulación técnica.\n\n" +
+      "ENTRADA:\n" + seleccionTexto;
+    return user;
+  }
+
+  function callOpenAI_chat(apiKey, systemPrompt, userPrompt, forceJson, onSuccess, onError) {
+    var body = {
+      "model": modelName,
+      "messages": [
+        { "role": "system", "content": systemPrompt },
+        { "role": "user", "content": userPrompt }
+      ],
+      "temperature": 0
+    };
+    if (forceJson) {
+      body["response_format"] = { "type": "json_object" };
+    }
+
+    postJson("https://api.openai.com/v1/chat/completions",
+      { "Authorization": "Bearer " + apiKey },
+      body,
+      function (data) {
+        try {
+          var content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+          if (!content) throw new Error("Sin contenido de modelo.");
+          onSuccess(content);
+        } catch (e) {
+          onError(e);
+        }
+      },
+      onError
+    );
+  }
+
+  function parseJsonSafe(text) {
+    try {
+      var t = (text || "").trim();
+      if (t.indexOf("```") === 0) {
+        t = t.replace(/^```(json)?/i, "").replace(/```$/i, "").trim();
+      }
+      return JSON.parse(t);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function recogerContexto() {
+    var ctx = {
+      "jurisdiccion": document.getElementById("jurisdiccion").value || "El Salvador",
+      "tipo": document.getElementById("tipoDoc").value || "",
+      "materia": document.getElementById("materia").value || ""
+    };
+    return ctx;
+  }
+
+  function onRevisarDocumentoCompleto() {
+    var apiKey = getApiKey();
+    if (!apiKey) { log("Pegue su API Key."); return; }
+
+    log("Recolectando párrafos...");
+    Word.run(function (context) {
+      var paragraphs = context.document.body.paragraphs;
+      paragraphs.load("items");
+      return context.sync().then(function () {
+        var items = paragraphs.items;
+        for (var i = 0; i < items.length; i++) {
+          items[i].load("text");
+        }
+        return context.sync().then(function () {
+          var arr = [];
+          for (var j = 0; j < items.length; j++) {
+            var t = items[j].text || "";
+            arr.push({ "index": j, "texto": t });
+          }
+
+          if (arr.length === 0) { log("No se encontraron párrafos."); return; }
+
+          var contexto = recogerContexto();
+          var batches = makeBatches(arr, 15000);
+          log("Párrafos: " + arr.length + ". Lotes: " + batches.length + ".");
+
+          processBatchSequential(apiKey, context, items, batches, contexto, 0, function () {
+            log("Documento revisado.");
+          }, function (err) {
+            log("Error: " + (err.message || err));
+          });
+        });
+      });
+    }).catch(function (e) { log("Error Word.run: " + e.message); });
+  }
+
+  function makeBatches(parrafosArr, limitChars) {
+    var batches = [];
+    var current = [];
+    var size = 0;
+    for (var i = 0; i < parrafosArr.length; i++) {
+      var p = parrafosArr[i];
+      var add = JSON.stringify(p).length;
+      if (size + add > limitChars && current.length > 0) {
+        batches.push(current);
+        current = [p];
+        size = add;
+      } else {
+        current.push(p);
+        size += add;
+      }
+    }
+    if (current.length > 0) batches.push(current);
+    return batches;
+  }
+
+  function processBatchSequential(apiKey, context, paragraphItems, batches, contexto, idx, onDone, onErr) {
+    if (idx >= batches.length) { onDone(); return; }
+
+    var batch = batches[idx];
+    log("Lote " + (idx + 1) + " de " + batches.length + ": enviando a OpenAI...");
+    var sys = buildSystemPrompt();
+    var user = buildUserPromptDocumento(batch, contexto);
+
+    callOpenAI_chat(apiKey, sys, user, true, function (content) {
+      var json = parseJsonSafe(content);
+      if (!json || !json.parrafos) {
+        onErr(new Error("El modelo no devolvió JSON válido para el lote " + (idx + 1) + "."));
+        return;
+      }
+      Word.run(function (ctx2) {
+        for (var k = 0; k < json.parrafos.length; k++) {
+          var item = json.parrafos[k];
+          var i = item.index;
+          var nuevo = item.texto || "";
+          if (paragraphItems[i]) {
+            paragraphItems[i].insertText(nuevo, InsertLocationReplace);
+          }
+        }
+        return ctx2.sync();
+      }).then(function () {
+        log("Lote " + (idx + 1) + " aplicado.");
+        processBatchSequential(apiKey, context, paragraphItems, batches, contexto, idx + 1, onDone, onErr);
+      }).catch(function (e) { onErr(e); });
+    }, onErr);
+  }
+
+  function onRevisarSeleccion() {
+    var apiKey = getApiKey();
+    if (!apiKey) { log("Pegue su API Key."); return; }
+
+    Word.run(function (context) {
+      var range = context.document.getSelection();
+      range.load("text");
+      return context.sync().then(function () {
+        var t = range.text || "";
+        if (!t) { log("No hay texto seleccionado."); return; }
+
+        log("Enviando selección a OpenAI...");
+        var sys = buildSystemPrompt();
+        var user = buildUserPromptSeleccion(t);
+
+        callOpenAI_chat(apiKey, sys, user, false, function (content) {
+          Word.run(function (ctx2) {
+            var r = ctx2.document.getSelection();
+            r.insertText(content, InsertLocationReplace);
+            return ctx2.sync();
+          }).then(function () { log("Selección mejorada."); })
+            .catch(function (e) { log("Error al aplicar selección: " + e.message); });
+        }, function (err) { log("Error: " + (err.message || err)); });
+      });
+    }).catch(function (e) { log("Error Word.run: " + e.message); });
+  }
+
+})();
