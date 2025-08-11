@@ -7,9 +7,10 @@
 
   Office.initialize = function () {
     if (document && document.getElementById) {
-      document.getElementById("btnRevisarDoc").onclick = onRevisarDocumentoCompleto;
       document.getElementById("btnRevisarSel").onclick = onRevisarSeleccion;
-      log("Listo. Abra un documento y use uno de los botones.");
+      document.getElementById("btnApplyPreview").onclick = onApplyPreview;
+      document.getElementById("btnCancelPreview").onclick = closePreview;
+      log("Listo. Selecciona texto en el documento y elige un nivel.");
     }
   };
 
@@ -32,20 +33,12 @@
       var xhr = new XMLHttpRequest();
       xhr.open("POST", url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
-      for (var h in headers) {
-        if (headers.hasOwnProperty(h)) {
-          xhr.setRequestHeader(h, headers[h]);
-        }
-      }
+      for (var h in headers) { if (headers.hasOwnProperty(h)) xhr.setRequestHeader(h, headers[h]); }
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              onSuccess(data);
-            } catch (e) {
-              onError(new Error("Respuesta no es JSON válido: " + e.message));
-            }
+            try { onSuccess(JSON.parse(xhr.responseText)); }
+            catch (e) { onError(new Error("Respuesta no es JSON válido: " + e.message)); }
           } else {
             onError(new Error("HTTP " + xhr.status + ": " + xhr.responseText));
           }
@@ -59,60 +52,27 @@
 
   function buildSystemPrompt() {
     var sys =
-      "Eres un asistente especializado en redacción judicial en español. " +
-      "Corrige ortografía, gramática, sintaxis y estilo con técnica jurídica, " +
-      "manteniendo tono formal y objetivo propio de resoluciones judiciales de El Salvador." +
-      "\n\nREGLAS:" +
-      "\n1) No agregues saludos, cierres, sugerencias ni comentarios meta. Solo el texto solicitado." +
-      "\n2) No inventes citas ni jurisprudencia. Si hay citas existentes, respétalas; solo mejora puntuación y formato." +
-      "\n3) Respeta nombres, fechas, montos y números de expediente." +
-      "\n4) Mantén el sentido jurídico. Mejora coherencia, cohesión y precisión terminológica." +
-      "\n5) No cambies la estructura numerada ni referencias internas." +
-      "\n6) Puntuación y formato sobrios; evita oraciones excesivamente largas; usa conectores jurídicos típicos." +
-      "\n7) Neutralidad y objetividad; evita adjetivación innecesaria.";
+      "Eres un asistente de redacción judicial penal en español (El Salvador). " +
+      "Corriges y mejoras textos preservando el sentido fáctico y procesal. " +
+      "Prohibido: saludos, cierres, explicaciones meta, inventar hechos o citas. " +
+      "Respeta nombres, fechas, montos, números de expediente y estructura. " +
+      "Estilo objetivo e impersonal; precisión terminológica penal.\n\n" +
+      "Modos:\n" +
+      "L1: solo ortografía, mayúsculas normativas, concordancias y puntuación; no cambies palabras ni el orden.\n" +
+      "L2: L1 + mejora moderada de claridad; puedes sustituir algunas palabras por equivalentes jurídicos y ajustar conectores manteniendo el bloque argumental (±15% de longitud).\n" +
+      "L3: voz de juez penal; reestructura para mayor técnica (hechos–prueba–norma–conclusión), refuerza estándares (suficiencia indiciaria, corroboración, cadena de custodia, sana crítica), sin añadir hechos ni citas inventadas.\n" +
+      "Salida: solo el texto final, sin comentarios; conserva saltos de párrafo y numeraciones.";
     return sys;
   }
 
-  function buildUserPromptDocumento(parrafosArr, contexto) {
-    var payload = {
-      "parrafos": parrafosArr,
-      "contexto_documento": contexto
-    };
-
-    var user =
-      "TAREA: REVISAR_DOCUMENTO_COMPLETO\n\n" +
-      "DEVOLUCIÓN ESTRICTA: JSON con la forma:\n" +
-      '{\n  "version": "1.0",\n  "parrafos": [\n' +
-      '    {\"index\": 0, \"texto\": \"<párrafo 0 corregido>\"},\n' +
-      '    {\"index\": 1, \"texto\": \"<párrafo 1 corregido>\"}\n' +
-      "  ]\n}\n\n" +
-      "REGLAS DE SALIDA:\n" +
-      "- Mismo número de párrafos y mismos índices.\n" +
-      "- No agregar ni eliminar párrafos.\n" +
-      "- No incluir comentarios ni texto fuera del JSON.\n" +
-      "- En cada 'texto', solo contenido del párrafo, sin estilos.\n\n" +
-      "ENTRADA JSON:\n" + JSON.stringify(payload);
-
-    return user;
+  function buildUserPromptSeleccion(seleccionTexto, nivel, enfoque) {
+    var header = "MODO: " + nivel + "\nMATERIA: penal\n";
+    if (enfoque) { header += "ENFOQUE_OPCIONAL: " + enfoque + "\n"; }
+    var body = "\nTEXTO_SELECCIONADO:\n" + seleccionTexto;
+    return header + body;
   }
 
-  function buildUserPromptSeleccion(seleccionTexto) {
-    var user =
-      "TAREA: MEJORAR_SELECCION\n\n" +
-      "DEVOLUCIÓN ESTRICTA:\n" +
-      "- Entrega únicamente el texto revisado, listo para sustituir la selección.\n" +
-      "- No agregues comentarios ni prefijos/sufijos.\n" +
-      "- Conserva los saltos de párrafo existentes.\n\n" +
-      "CRITERIOS:\n" +
-      "- Refuerza claridad, coherencia y técnica argumentativa.\n" +
-      "- Usa terminología jurídica precisa según el contenido.\n" +
-      "- Si hay numerales/listas, respeta su estructura.\n" +
-      "- No inventes jurisprudencia ni doctrina; mejora la formulación técnica.\n\n" +
-      "ENTRADA:\n" + seleccionTexto;
-    return user;
-  }
-
-  function callOpenAI_chat(apiKey, systemPrompt, userPrompt, forceJson, onSuccess, onError) {
+  function callOpenAI_chat(apiKey, systemPrompt, userPrompt, onSuccess, onError) {
     var body = {
       "model": modelName,
       "messages": [
@@ -121,9 +81,6 @@
       ],
       "temperature": 0
     };
-    if (forceJson) {
-      body["response_format"] = { "type": "json_object" };
-    }
 
     postJson("https://api.openai.com/v1/chat/completions",
       { "Authorization": "Bearer " + apiKey },
@@ -133,142 +90,45 @@
           var content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
           if (!content) throw new Error("Sin contenido de modelo.");
           onSuccess(content);
-        } catch (e) {
-          onError(e);
-        }
+        } catch (e) { onError(e); }
       },
       onError
     );
   }
 
-  function parseJsonSafe(text) {
-    try {
-      var t = (text || "").trim();
-      if (t.indexOf("```") === 0) {
-        t = t.replace(/^```(json)?/i, "").replace(/```$/i, "").trim();
-      }
-      return JSON.parse(t);
-    } catch (e) {
-      return null;
-    }
+  function openPreview(text, modeLabel) {
+    var ta = document.getElementById("previewText");
+    ta.value = text || "";
+    document.getElementById("modalTitle").textContent = "Vista previa de cambios (" + modeLabel + ")";
+    document.getElementById("backdrop").style.display = "block";
+    document.getElementById("previewModal").style.display = "block";
+  }
+  function closePreview() {
+    document.getElementById("backdrop").style.display = "none";
+    document.getElementById("previewModal").style.display = "none";
+  }
+  function onApplyPreview() {
+    var ta = document.getElementById("previewText");
+    var finalText = ta.value;
+    closePreview();
+    applyToSelection(finalText);
   }
 
-  function recogerContexto() {
-    var ctx = {
-      "jurisdiccion": document.getElementById("jurisdiccion").value || "El Salvador",
-      "tipo": document.getElementById("tipoDoc").value || "",
-      "materia": document.getElementById("materia").value || ""
-    };
-    return ctx;
+  function applyToSelection(text) {
+    Word.run(function (ctx2) {
+      var r = ctx2.document.getSelection();
+      r.insertText(text, InsertLocationReplace);
+      return ctx2.sync();
+    }).then(function () { log("Cambios aplicados a la selección."); })
+      .catch(function (e) { log("Error al aplicar: " + e.message); });
   }
 
-  // --- Revisar documento completo ---
-  function onRevisarDocumentoCompleto() {
-    var apiKey = getApiKey();
-    if (!apiKey) { log("Pegue su API Key."); return; }
-
-    log("Recolectando párrafos...");
-    Word.run(function (context) {
-      var paragraphs = context.document.body.paragraphs;
-      paragraphs.load("items");
-      return context.sync().then(function () {
-        var items = paragraphs.items;
-        for (var i = 0; i < items.length; i++) {
-          items[i].load("text");
-        }
-        return context.sync().then(function () {
-          var arr = [];
-          for (var j = 0; j < items.length; j++) {
-            var t = items[j].text || "";
-            arr.push({ "index": j, "texto": t });
-          }
-
-          if (arr.length === 0) {
-            log("No se encontraron párrafos.");
-            return;
-          }
-
-          var contexto = recogerContexto();
-          var batches = makeBatches(arr, 15000); // ~15k chars por lote
-          log("Párrafos: " + arr.length + ". Lotes: " + batches.length + ".");
-
-          // Procesamiento secuencial de lotes (sin reutilizar proxies entre Word.run)
-          processBatchSequential(apiKey, batches, contexto, 0, function () {
-            log("Documento revisado.");
-          }, function (err) {
-            log("Error: " + (err.message || err));
-          });
-        });
-      });
-    }).catch(function (e) { log("Error Word.run: " + e.message); });
-  }
-
-  function makeBatches(parrafosArr, limitChars) {
-    var batches = [];
-    var current = [];
-    var size = 0;
-    for (var i = 0; i < parrafosArr.length; i++) {
-      var p = parrafosArr[i];
-      var add = JSON.stringify(p).length;
-      if (size + add > limitChars && current.length > 0) {
-        batches.push(current);
-        current = [p];
-        size = add;
-      } else {
-        current.push(p);
-        size += add;
-      }
-    }
-    if (current.length > 0) batches.push(current);
-    return batches;
-  }
-
-  // Nueva versión: cada aplicación se hace dentro de su propio Word.run
-  // y se vuelve a cargar la colección de párrafos para obtener proxies válidos.
-  function processBatchSequential(apiKey, batches, contexto, idx, onDone, onErr) {
-    if (idx >= batches.length) { onDone(); return; }
-
-    var batch = batches[idx];
-    log("Lote " + (idx + 1) + " de " + batches.length + ": enviando a OpenAI...");
-    var sys = buildSystemPrompt();
-    var user = buildUserPromptDocumento(batch, contexto);
-
-    callOpenAI_chat(apiKey, sys, user, true, function (content) {
-      var json = parseJsonSafe(content);
-      if (!json || !json.parrafos) {
-        onErr(new Error("El modelo no devolvió JSON válido para el lote " + (idx + 1) + "."));
-        return;
-      }
-
-      Word.run(function (ctx2) {
-        var paragraphs2 = ctx2.document.body.paragraphs;
-        paragraphs2.load("items");
-        return ctx2.sync().then(function () {
-          // Aplicar cambios usando proxies válidos de este contexto
-          for (var k = 0; k < json.parrafos.length; k++) {
-            var item = json.parrafos[k];
-            var i = item.index;
-            var nuevo = item.texto || "";
-            if (paragraphs2.items && paragraphs2.items.length > i && paragraphs2.items[i]) {
-              paragraphs2.items[i].insertText(nuevo, InsertLocationReplace);
-            }
-          }
-          return ctx2.sync();
-        });
-      }).then(function () {
-        log("Lote " + (idx + 1) + " aplicado.");
-        processBatchSequential(apiKey, batches, contexto, idx + 1, onDone, onErr);
-      }).catch(function (e) {
-        onErr(e);
-      });
-
-    }, onErr);
-  }
-
-  // --- Revisar selección ---
   function onRevisarSeleccion() {
     var apiKey = getApiKey();
     if (!apiKey) { log("Pegue su API Key."); return; }
+
+    var nivel = document.getElementById("nivel").value || "L1";
+    var enfoque = document.getElementById("enfoque").value || "";
 
     Word.run(function (context) {
       var range = context.document.getSelection();
@@ -277,18 +137,19 @@
         var t = range.text || "";
         if (!t) { log("No hay texto seleccionado."); return; }
 
-        log("Enviando selección a OpenAI...");
+        log("Solicitando sugerencia (" + nivel + ")...");
         var sys = buildSystemPrompt();
-        var user = buildUserPromptSeleccion(t);
+        var user = buildUserPromptSeleccion(t, nivel, enfoque);
 
-        callOpenAI_chat(apiKey, sys, user, false, function (content) {
-          Word.run(function (ctx2) {
-            var r = ctx2.document.getSelection();
-            r.insertText(content, InsertLocationReplace);
-            return ctx2.sync();
-          }).then(function () { log("Selección mejorada."); })
-            .catch(function (e) { log("Error al aplicar selección: " + e.message); });
-        }, function (err) { log("Error: " + (err.message || err)); });
+        callOpenAI_chat(apiKey, sys, user, function (content) {
+          if (nivel === "L1") {
+            applyToSelection(content);
+          } else {
+            openPreview(content, nivel);
+          }
+        }, function (err) {
+          log("Error: " + (err.message || err));
+        });
       });
     }).catch(function (e) { log("Error Word.run: " + e.message); });
   }

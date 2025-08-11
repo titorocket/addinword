@@ -14,52 +14,59 @@
     input[type="password"], input[type="text"], select { width: 100%; padding: 6px; font-size: 12px; }
     button { margin-top: 8px; padding: 8px; width: 100%; font-size: 13px; }
     .row { margin-top: 8px; }
-    #log { margin-top: 10px; font-size: 12px; white-space: pre-wrap; background: #f5f5f5; padding: 8px; border: 1px solid #ddd; height: 160px; overflow:auto;}
+    #log { margin-top: 10px; font-size: 12px; white-space: pre-wrap; background: #f5f5f5; padding: 8px; border: 1px solid #ddd; height: 120px; overflow:auto;}
     .tips { font-size: 11px; color: #555; }
+    .modal-backdrop { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9998; }
+    .modal { display:none; position:fixed; top:5%; left:5%; width:90%; height:85%; background:#fff; border:1px solid #ccc; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:9999; }
+    .modal header { padding:8px 12px; background:#f0f0f0; font-weight:bold; }
+    .modal .content { padding:8px; }
+    .modal textarea { width:100%; height:calc(85vh - 140px); font-size:13px; }
+    .modal .actions { padding:8px; text-align:right; }
+    .modal .actions button { width:auto; min-width:100px; margin-left:8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Redacción Judicial</h1>
+
     <div class="row">
       <label for="apiKey">API Key de OpenAI (no se guarda):</label>
       <input id="apiKey" type="password" placeholder="sk-..." />
-      <div class="tips">Por seguridad, se recomienda usar un proxy propio; pegar la API Key aquí la expone al navegador.</div>
+      <div class="tips">Para producción usa un proxy. Aquí la Key viaja desde el navegador.</div>
     </div>
 
     <div class="row">
-      <label for="jurisdiccion">Jurisdicción</label>
-      <input id="jurisdiccion" type="text" value="El Salvador" />
-    </div>
-    <div class="row">
-      <label for="tipoDoc">Tipo de documento</label>
-      <select id="tipoDoc">
-        <option value="">(no especificado)</option>
-        <option>sentencia</option>
-        <option>auto</option>
-        <option>escrito</option>
-        <option>providencia</option>
-        <option>resolución</option>
-      </select>
-    </div>
-    <div class="row">
-      <label for="materia">Materia</label>
-      <select id="materia">
-        <option value="">(no especificado)</option>
-        <option>penal</option>
-        <option>civil</option>
-        <option>familia</option>
-        <option>mercantil</option>
-        <option>constitucional</option>
+      <label for="nivel">Nivel de mejora (solo selección):</label>
+      <select id="nivel">
+        <option value="L1">L1 — Ortografía y gramática (automático)</option>
+        <option value="L2">L2 — Mejora moderada (previa vista)</option>
+        <option value="L3">L3 — Juez penal técnico (previa vista)</option>
       </select>
     </div>
 
     <div class="row">
-      <button id="btnRevisarDoc">1) Revisar documento completo</button>
-      <button id="btnRevisarSel">2) Mejorar solo la selección</button>
+      <label for="enfoque">Enfoque opcional (penal):</label>
+      <input id="enfoque" type="text" placeholder="p.ej., medida cautelar, valoración de testigo protegido" />
+    </div>
+
+    <div class="row">
+      <button id="btnRevisarSel">Mejorar selección</button>
     </div>
 
     <div id="log" aria-live="polite"></div>
+  </div>
+
+  <div id="backdrop" class="modal-backdrop"></div>
+  <div id="previewModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header id="modalTitle">Vista previa de cambios</header>
+    <div class="content">
+      <div class="tips">Puedes ajustar el texto antes de aplicarlo.</div>
+      <textarea id="previewText"></textarea>
+    </div>
+    <div class="actions">
+      <button id="btnCancelPreview">Cancelar</button>
+      <button id="btnApplyPreview">Aplicar</button>
+    </div>
   </div>
 
   <script src="taskpane.js"></script>

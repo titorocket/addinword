@@ -5,11 +5,11 @@
            xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
            xsi:type="TaskPaneApp">
   <Id>5e7a0f5d-2c9a-4a1b-bd79-9a1a7b49f3e5</Id>
-  <Version>1.0.0.0</Version>
+  <Version>1.0.2.0</Version>
   <ProviderName>Redacción Judicial</ProviderName>
   <DefaultLocale>es-ES</DefaultLocale>
   <DisplayName DefaultValue="Redacción Judicial — Word" />
-  <Description DefaultValue="Revisión ortográfica y técnica jurídica con OpenAI para documentos y selecciones en Word." />
+  <Description DefaultValue="Mejora penal por selección: L1 (auto), L2/L3 con vista previa." />
   <IconUrl DefaultValue="https://titorocket.github.io/addinword/icon-32.png" />
   <HighResolutionIconUrl DefaultValue="https://titorocket.github.io/addinword/icon-64.png" />
   <SupportUrl DefaultValue="https://titorocket.github.io/addinword/" />
@@ -44,7 +44,7 @@
                   <bt:Image size="32" resid="icon32"/>
                   <bt:Image size="80" resid="icon80"/>
                 </Icon>
-                <Control xsi:type="Button" id="btnOpenPane" label="Abrir panel" screentip="Abrir Redacción Judicial" supertip="Abrir panel del complemento" icon="icon32" >
+                <Control xsi:type="Button" id="btnOpenPane" label="Abrir panel" screentip="Abrir Redacción Judicial" supertip="Abrir panel del complemento">
                   <Icon>
                     <bt:Image size="16" resid="icon16"/>
                     <bt:Image size="32" resid="icon32"/>
@@ -78,7 +78,7 @@
         <bt:String id="residGetStartedTitle" DefaultValue="Redacción Judicial"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="residGetStartedDescription" DefaultValue="Revise el documento completo o solo la selección con técnica jurídica."/>
+        <bt:String id="residGetStartedDescription" DefaultValue="Revisión por selección con niveles: L1 automático; L2/L3 con vista previa."/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
