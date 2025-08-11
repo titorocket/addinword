@@ -3,13 +3,17 @@
   "use strict";
 
   var InsertLocationReplace = "Replace";
+  var InsertLocationEnd = "End";
   var modelName = "gpt-4o-mini";
 
   Office.initialize = function () {
     if (document && document.getElementById) {
       document.getElementById("btnRevisarSel").onclick = onRevisarSeleccion;
-      document.getElementById("btnApplyPreview").onclick = onApplyPreview;
+      document.getElementById("btnApplyPreview").onclick = onApplyPreviewReplace;
+      document.getElementById("btnInsertBelow").onclick = onApplyPreviewInsert;
       document.getElementById("btnCancelPreview").onclick = closePreview;
+      document.getElementById("nivel").onchange = onNivelChange;
+      onNivelChange(); // inicializa visibilidad de Idea central
       log("Listo. Selecciona texto en el documento y elige un nivel.");
     }
   };
@@ -23,11 +27,19 @@
     }
   }
 
+  function onNivelChange() {
+    var nivel = document.getElementById("nivel").value;
+    var row = document.getElementById("ideaRow");
+    // Mostrar "Idea central" solo para L4
+    row.style.display = (nivel === "L4") ? "block" : "none";
+  }
+
   function getApiKey() {
     var k = document.getElementById("apiKey").value;
     return (k || "").trim();
   }
 
+  // XHR (evita fetch para IE11)
   function postJson(url, headers, bodyObj, onSuccess, onError) {
     try {
       var xhr = new XMLHttpRequest();
@@ -50,25 +62,31 @@
     }
   }
 
+  // SYSTEM fijo (penal) con 4 niveles
   function buildSystemPrompt() {
     var sys =
       "Eres un asistente de redacción judicial penal en español (El Salvador). " +
       "Corriges y mejoras textos preservando el sentido fáctico y procesal. " +
-      "Prohibido: saludos, cierres, explicaciones meta, inventar hechos o citas. " +
+      "Prohibido: saludos, cierres, explicaciones meta; inventar hechos; inventar citas. " +
       "Respeta nombres, fechas, montos, números de expediente y estructura. " +
       "Estilo objetivo e impersonal; precisión terminológica penal.\n\n" +
       "Modos:\n" +
-      "L1: solo ortografía, mayúsculas normativas, concordancias y puntuación; no cambies palabras ni el orden.\n" +
-      "L2: L1 + mejora moderada de claridad; puedes sustituir algunas palabras por equivalentes jurídicos y ajustar conectores manteniendo el bloque argumental (±15% de longitud).\n" +
-      "L3: voz de juez penal; reestructura para mayor técnica (hechos–prueba–norma–conclusión), refuerza estándares (suficiencia indiciaria, corroboración, cadena de custodia, sana crítica), sin añadir hechos ni citas inventadas.\n" +
+      "L1_CORRECCIÓN_MÍNIMA: solo ortografía, mayúsculas normativas, concordancias y puntuación; no cambies palabras ni el orden.\n" +
+      "L2_MEJORA_MODERADA: L1 + claridad; sustituye algunas palabras por equivalentes jurídicos y ajusta conectores manteniendo el bloque argumental (±15%).\n" +
+      "L3_TÉCNICA_PENAL_REFORZADA: voz técnica (no juez); reordena levemente para coherencia (hechos–prueba–norma–conclusión), refuerza estándares (suficiencia indiciaria, corroboración, cadena de custodia, sana crítica), sin añadir hechos (±30%).\n" +
+      "L4_JUEZ_PENAL_FUNDAMENTA: simula ser juez penal y elabora fundamentación a partir de IDEA_CENTRAL (si se provee) o de la selección; estructura sugerida: hechos relevantes – problema jurídico – calificación típica – valoración probatoria – derecho aplicable – conclusión. Sin inventar hechos ni citas.\n" +
       "Salida: solo el texto final, sin comentarios; conserva saltos de párrafo y numeraciones.";
     return sys;
   }
 
-  function buildUserPromptSeleccion(seleccionTexto, nivel, enfoque) {
+  // USER por selección + enfoque + idea (solo L4 la usa si viene)
+  function buildUserPromptSeleccion(seleccionTexto, nivel, enfoque, ideaCentral) {
     var header = "MODO: " + nivel + "\nMATERIA: penal\n";
     if (enfoque) { header += "ENFOQUE_OPCIONAL: " + enfoque + "\n"; }
-    var body = "\nTEXTO_SELECCIONADO:\n" + seleccionTexto;
+    if (nivel === "L4") {
+      header += "IDEA_CENTRAL: " + (ideaCentral || "") + "\n";
+    }
+    var body = "\nTEXTO_SELECCIONADO:\n" + (seleccionTexto || "");
     return header + body;
   }
 
@@ -96,6 +114,7 @@
     );
   }
 
+  // Modal
   function openPreview(text, modeLabel) {
     var ta = document.getElementById("previewText");
     ta.value = text || "";
@@ -107,49 +126,66 @@
     document.getElementById("backdrop").style.display = "none";
     document.getElementById("previewModal").style.display = "none";
   }
-  function onApplyPreview() {
+  function onApplyPreviewReplace() {
     var ta = document.getElementById("previewText");
     var finalText = ta.value;
     closePreview();
-    applyToSelection(finalText);
+    applyToSelection(finalText, true);
+  }
+  function onApplyPreviewInsert() {
+    var ta = document.getElementById("previewText");
+    var finalText = ta.value;
+    closePreview();
+    applyToSelection(finalText, false);
   }
 
-  function applyToSelection(text) {
+  // Aplicar a selección: replace o insertar debajo (útil en L4)
+  function applyToSelection(text, replace) {
     Word.run(function (ctx2) {
       var r = ctx2.document.getSelection();
-      r.insertText(text, InsertLocationReplace);
+      if (replace) {
+        r.insertText(text, InsertLocationReplace);
+      } else {
+        // Inserta un salto de párrafo y luego el texto sugerido
+        r.insertText("\r" + text, InsertLocationEnd);
+      }
       return ctx2.sync();
     }).then(function () { log("Cambios aplicados a la selección."); })
       .catch(function (e) { log("Error al aplicar: " + e.message); });
   }
 
+  // Flujo principal: solo selección (L1 aplica directo; L2/L3/L4 vista previa)
   function onRevisarSeleccion() {
     var apiKey = getApiKey();
     if (!apiKey) { log("Pegue su API Key."); return; }
 
     var nivel = document.getElementById("nivel").value || "L1";
     var enfoque = document.getElementById("enfoque").value || "";
+    var ideaCentral = document.getElementById("ideaCentral").value || "";
 
     Word.run(function (context) {
       var range = context.document.getSelection();
       range.load("text");
       return context.sync().then(function () {
         var t = range.text || "";
-        if (!t) { log("No hay texto seleccionado."); return; }
+        if (!t && nivel !== "L4") { log("No hay texto seleccionado."); return; }
+        // En L4 se permite que no haya selección si hay Idea central
+        if (!t && nivel === "L4" && !ideaCentral) {
+          log("L4: provea selección o una 'Idea central'.");
+          return;
+        }
 
         log("Solicitando sugerencia (" + nivel + ")...");
         var sys = buildSystemPrompt();
-        var user = buildUserPromptSeleccion(t, nivel, enfoque);
+        var user = buildUserPromptSeleccion(t, nivel, enfoque, ideaCentral);
 
         callOpenAI_chat(apiKey, sys, user, function (content) {
           if (nivel === "L1") {
-            applyToSelection(content);
+            applyToSelection(content, true);
           } else {
             openPreview(content, nivel);
           }
-        }, function (err) {
-          log("Error: " + (err.message || err));
-        });
+        }, function (err) { log("Error: " + (err.message || err)); });
       });
     }).catch(function (e) { log("Error Word.run: " + e.message); });
   }
