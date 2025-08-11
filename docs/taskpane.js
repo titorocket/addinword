@@ -162,6 +162,7 @@
     return ctx;
   }
 
+  // --- Revisar documento completo ---
   function onRevisarDocumentoCompleto() {
     var apiKey = getApiKey();
     if (!apiKey) { log("Pegue su API Key."); return; }
@@ -182,13 +183,17 @@
             arr.push({ "index": j, "texto": t });
           }
 
-          if (arr.length === 0) { log("No se encontraron párrafos."); return; }
+          if (arr.length === 0) {
+            log("No se encontraron párrafos.");
+            return;
+          }
 
           var contexto = recogerContexto();
-          var batches = makeBatches(arr, 15000);
+          var batches = makeBatches(arr, 15000); // ~15k chars por lote
           log("Párrafos: " + arr.length + ". Lotes: " + batches.length + ".");
 
-          processBatchSequential(apiKey, context, items, batches, contexto, 0, function () {
+          // Procesamiento secuencial de lotes (sin reutilizar proxies entre Word.run)
+          processBatchSequential(apiKey, batches, contexto, 0, function () {
             log("Documento revisado.");
           }, function (err) {
             log("Error: " + (err.message || err));
@@ -218,7 +223,9 @@
     return batches;
   }
 
-  function processBatchSequential(apiKey, context, paragraphItems, batches, contexto, idx, onDone, onErr) {
+  // Nueva versión: cada aplicación se hace dentro de su propio Word.run
+  // y se vuelve a cargar la colección de párrafos para obtener proxies válidos.
+  function processBatchSequential(apiKey, batches, contexto, idx, onDone, onErr) {
     if (idx >= batches.length) { onDone(); return; }
 
     var batch = batches[idx];
@@ -232,23 +239,33 @@
         onErr(new Error("El modelo no devolvió JSON válido para el lote " + (idx + 1) + "."));
         return;
       }
+
       Word.run(function (ctx2) {
-        for (var k = 0; k < json.parrafos.length; k++) {
-          var item = json.parrafos[k];
-          var i = item.index;
-          var nuevo = item.texto || "";
-          if (paragraphItems[i]) {
-            paragraphItems[i].insertText(nuevo, InsertLocationReplace);
+        var paragraphs2 = ctx2.document.body.paragraphs;
+        paragraphs2.load("items");
+        return ctx2.sync().then(function () {
+          // Aplicar cambios usando proxies válidos de este contexto
+          for (var k = 0; k < json.parrafos.length; k++) {
+            var item = json.parrafos[k];
+            var i = item.index;
+            var nuevo = item.texto || "";
+            if (paragraphs2.items && paragraphs2.items.length > i && paragraphs2.items[i]) {
+              paragraphs2.items[i].insertText(nuevo, InsertLocationReplace);
+            }
           }
-        }
-        return ctx2.sync();
+          return ctx2.sync();
+        });
       }).then(function () {
         log("Lote " + (idx + 1) + " aplicado.");
-        processBatchSequential(apiKey, context, paragraphItems, batches, contexto, idx + 1, onDone, onErr);
-      }).catch(function (e) { onErr(e); });
+        processBatchSequential(apiKey, batches, contexto, idx + 1, onDone, onErr);
+      }).catch(function (e) {
+        onErr(e);
+      });
+
     }, onErr);
   }
 
+  // --- Revisar selección ---
   function onRevisarSeleccion() {
     var apiKey = getApiKey();
     if (!apiKey) { log("Pegue su API Key."); return; }
