@@ -4,7 +4,7 @@
 
   var InsertLocationReplace = "Replace";
   var InsertLocationEnd = "End";
-  var modelName = "gpt-4o-mini";
+  var modelName = "gpt-4o-mini"; // ajusta si usas otro modelo
 
   Office.initialize = function () {
     if (document && document.getElementById) {
@@ -12,6 +12,7 @@
       document.getElementById("btnApplyPreview").onclick = onApplyPreviewReplace;
       document.getElementById("btnInsertBelow").onclick = onApplyPreviewInsert;
       document.getElementById("btnCancelPreview").onclick = closePreview;
+      document.getElementById("btnCargarOficio23").onclick = onCargarOficio23;
       document.getElementById("nivel").onchange = onNivelChange;
       onNivelChange(); // inicializa visibilidad de Idea central
       log("Listo. Selecciona texto en el documento y elige un nivel.");
@@ -114,7 +115,7 @@
     );
   }
 
-  // Modal
+  // ------- Modal -------
   function openPreview(text, modeLabel) {
     var ta = document.getElementById("previewText");
     ta.value = text || "";
@@ -154,7 +155,7 @@
       .catch(function (e) { log("Error al aplicar: " + e.message); });
   }
 
-  // Flujo principal: solo selección (L1 aplica directo; L2/L3/L4 vista previa)
+  // ------- Flujo principal (solo selección) -------
   function onRevisarSeleccion() {
     var apiKey = getApiKey();
     if (!apiKey) { log("Pegue su API Key."); return; }
@@ -190,4 +191,45 @@
     }).catch(function (e) { log("Error Word.run: " + e.message); });
   }
 
+  // ------- Cargar plantilla oficio23 -------
+  // IE11-friendly GET de texto
+  function getTextViaXHR(url, onOk, onErr) {
+    try {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            onOk(xhr.responseText);
+          } else {
+            onErr(new Error("HTTP " + xhr.status + " al obtener " + url));
+          }
+        }
+      };
+      xhr.send();
+    } catch (ex) { onErr(ex); }
+  }
+
+  // Intenta mostrar oficio23.txt en el panel; si no existe, abre oficio23.docx en Word
+  function onCargarOficio23() {
+    var base = "https://titorocket.github.io/addinword/"; // misma carpeta del manifiesto
+    var urlTxt = base + "oficio23.txt";
+    var urlDocx = base + "oficio23.docx";
+
+    log("Cargando plantilla oficio23...");
+
+    getTextViaXHR(urlTxt, function (texto) {
+      openPreview(texto, "Plantilla oficio23");
+    }, function () {
+      log("No se encontró oficio23.txt; se abrirá oficio23.docx en Word...");
+      Word.run(function (context) {
+        context.application.createDocument(urlDocx).open();
+        return context.sync();
+      }).catch(function (e) {
+        log("Error abriendo oficio23.docx: " + e.message);
+      });
+    });
+  }
+
 })();
+
